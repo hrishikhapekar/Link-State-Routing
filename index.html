@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Link State Routing Algorithm Simulator</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header Section -->
+        <header class="header">
+            <h1>Link State Routing Algorithm Simulator</h1>
+            <p>Interactive demonstration of link state routing protocols with animated packet transmission</p>
+        </header>
+
+        <!-- Control Panel -->
+        <div class="control-panel">
+            <div class="control-group">
+                <h3>Node Controls</h3>
+                <div class="control-buttons">
+                    <button class="btn btn--primary" id="addSender">Add Sender Node</button>
+                    <button class="btn btn--primary" id="addRouter">Add Router</button>
+                    <button class="btn btn--primary" id="addReceiver">Add Receiver Node</button>
+                    <button class="btn btn--outline" id="removeNode">Remove Selected Node</button>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <h3>Connection Controls</h3>
+                <div class="control-buttons">
+                    <button class="btn btn--secondary" id="connectMode">Connect Nodes</button>
+                    <div class="input-group">
+                        <label for="linkCost">Link Cost:</label>
+                        <input type="number" id="linkCost" class="form-control" min="1" max="20" value="1">
+                    </div>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <h3>Animation Controls</h3>
+                <div class="control-buttons">
+                    <div class="input-group">
+                        <label for="senderSelect">Select Sender:</label>
+                        <select id="senderSelect" class="form-control">
+                            <option value="">Choose a sender</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label for="receiverSelect">Select Receiver:</label>
+                        <select id="receiverSelect" class="form-control">
+                            <option value="">Choose a receiver</option>
+                        </select>
+                    </div>
+                    <button class="btn btn--primary btn--lg" id="sendPacket">Send Packet</button>
+                    <button class="btn btn--outline" id="resetNetwork">Reset Network</button>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <h3>Display Options</h3>
+                <div class="control-buttons">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="showRoutingTables"> Show Routing Tables
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="showDijkstraTable"> Show Dijkstra's Algorithm Table
+                    </label>
+                    <div class="input-group">
+                        <label for="speedSlider">Animation Speed:</label>
+                        <input type="range" id="speedSlider" min="1" max="10" value="5" class="speed-slider">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status Message -->
+        <div id="statusMessage" class="status-message"></div>
+
+        <!-- Canvas Area -->
+        <div class="canvas-container">
+            <svg id="networkCanvas" width="900" height="600">
+                <defs>
+                    <marker id="arrowhead" markerWidth="10" markerHeight="7" 
+                            refX="9" refY="3.5" orient="auto">
+                        <polygon points="0 0, 10 3.5, 0 7" fill="#666" />
+                    </marker>
+                </defs>
+            </svg>
+        </div>
+
+        <!-- Dijkstra Algorithm Table - POSITIONED DIRECTLY BELOW CANVAS -->
+        <div id="dijkstraTableContainer" class="dijkstra-table-container" style="display: none;">
+            <!-- Table content will be inserted here by JavaScript -->
+        </div>
+
+        <!-- Information Section -->
+        <div class="info-section">
+            <div class="tabs">
+                <div class="tab-buttons">
+                    <button class="tab-btn active" data-tab="overview">What is Link State Routing?</button>
+                    <button class="tab-btn" data-tab="process">How It Works</button>
+                    <button class="tab-btn" data-tab="algorithm">Dijkstra's Algorithm</button>
+                    <button class="tab-btn" data-tab="simulation">How This Animation Works</button>
+                </div>
+
+                <div class="tab-content active" id="overview">
+                    <h2>What is Link State Routing?</h2>
+                    <p><strong>Link State Routing</strong> is a routing protocol where each router has complete knowledge of the network topology. This comprehensive understanding enables optimal path selection and efficient packet forwarding.</p>
+                    
+                    <h3>Key Characteristics:</h3>
+                    <ul>
+                        <li><strong>Complete Topology Knowledge:</strong> Each router knows the entire network topology</li>
+                        <li><strong>Dijkstra's Algorithm:</strong> Uses shortest path algorithm for optimal routing</li>
+                        <li><strong>Neighbor Information Sharing:</strong> Routers share information only about their direct neighbors</li>
+                        <li><strong>Information Flooding:</strong> Link state advertisements are flooded throughout the network</li>
+                        <li><strong>Fast Convergence:</strong> Quick adaptation to topology changes</li>
+                    </ul>
+
+                    <h3>Main Protocols:</h3>
+                    <ul>
+                        <li><strong>OSPF</strong> (Open Shortest Path First)</li>
+                        <li><strong>IS-IS</strong> (Intermediate System to Intermediate System)</li>
+                    </ul>
+                </div>
+
+                <div class="tab-content" id="process">
+                    <h2>How Link State Routing Works</h2>
+                    <p>Link state routing operates through a systematic 7-step process:</p>
+                    
+                    <div class="process-steps">
+                        <div class="step">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <h4>Neighbor Discovery</h4>
+                                <p>Each router discovers its directly connected neighbors and the cost/distance to reach them.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="step">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <h4>Link State Advertisement (LSA)</h4>
+                                <p>Each router creates a Link State Packet containing information about its neighbors and link costs.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="step">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <h4>Flooding</h4>
+                                <p>Each router floods its LSA to all other routers in the network. Every router receives a copy of every other router's LSA.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="step">
+                            <div class="step-number">4</div>
+                            <div class="step-content">
+                                <h4>Topology Database Construction</h4>
+                                <p>Each router builds a complete topology database (map) of the network using all received LSAs.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="step">
+                            <div class="step-number">5</div>
+                            <div class="step-content">
+                                <h4>Shortest Path Calculation</h4>
+                                <p>Each router runs Dijkstra's algorithm on the topology database to calculate shortest paths to all destinations.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="step">
+                            <div class="step-number">6</div>
+                            <div class="step-content">
+                                <h4>Routing Table Creation</h4>
+                                <p>Based on shortest path calculations, each router creates its forwarding/routing table.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="step">
+                            <div class="step-number">7</div>
+                            <div class="step-content">
+                                <h4>Packet Forwarding</h4>
+                                <p>When a packet arrives, the router consults its routing table and forwards the packet to the appropriate next-hop router.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="algorithm">
+                    <h2>Dijkstra's Algorithm</h2>
+                    <p>Dijkstra's algorithm is the core component of link state routing that finds the shortest path from a source node to all other nodes in a weighted graph.</p>
+                    
+                    <h3>Algorithm Steps:</h3>
+                    <ol>
+                        <li><strong>Initialize:</strong> Set distance to source as 0, all others as infinity</li>
+                        <li><strong>Create unvisited set</strong> containing all nodes</li>
+                        <li><strong>Main Loop:</strong> While unvisited set is not empty:
+                            <ul>
+                                <li>Select node with minimum distance from unvisited set</li>
+                                <li>Mark it as visited</li>
+                                <li>For each unvisited neighbor, calculate tentative distance</li>
+                                <li>If tentative distance is less than current distance, update it</li>
+                            </ul>
+                        </li>
+                        <li><strong>Complete:</strong> All shortest paths are now computed</li>
+                    </ol>
+                    
+                    <div class="algorithm-info">
+                        <p><strong>Time Complexity:</strong> O(n²) where n is the number of nodes</p>
+                        <p><strong>Space Complexity:</strong> O(n) for storing distances and visited nodes</p>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="simulation">
+                    <h2>How This Animation Works</h2>
+                    <p>This interactive simulator demonstrates link state routing through visual animations and user controls:</p>
+                    
+                    <h3>Using the Simulator:</h3>
+                    <div class="simulation-guide">
+                        <div class="guide-section">
+                            <h4>Creating the Network:</h4>
+                            <ul>
+                                <li>Click <strong>'Add Sender Node'</strong>, <strong>'Add Router'</strong>, or <strong>'Add Receiver Node'</strong> to add nodes</li>
+                                <li>Drag nodes around the canvas to rearrange the network topology</li>
+                                <li>Click <strong>'Connect Nodes'</strong> button to enter connection mode</li>
+                                <li>Set the desired link cost in the input field (1-20)</li>
+                                <li>Click two nodes to create a weighted link between them</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="guide-section">
+                            <h4>Packet Transmission:</h4>
+                            <ul>
+                                <li>Select a sender from the dropdown menu</li>
+                                <li>Select a receiver from the dropdown menu</li>
+                                <li>Click <strong>'Send Packet'</strong> to start the animation</li>
+                                <li><span class="packet-demo request"></span> <strong>Red packet</strong> represents the request traveling from sender to receiver</li>
+                                <li><span class="packet-demo response"></span> <strong>Blue packet</strong> represents the response traveling back from receiver to sender</li>
+                                <li><strong>Yellow/lime highlighting</strong> shows the active path being used</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="guide-section">
+                            <h4>Algorithm Operation:</h4>
+                            <ul>
+                                <li>The simulator automatically calculates the shortest path using Dijkstra's algorithm</li>
+                                <li>Path calculation considers all link costs to find the optimal route</li>
+                                <li>If no path exists between sender and receiver, an error message is displayed</li>
+                                <li>Animation speed can be adjusted using the slider control</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="guide-section">
+                            <h4>Additional Features:</h4>
+                            <ul>
+                                <li>Enable <strong>'Show Routing Tables'</strong> to see forwarding information at each router</li>
+                                <li>Click <strong>'Remove Selected Node'</strong> to delete a selected node and its connections</li>
+                                <li>Use <strong>'Reset Network'</strong> to return to the default sample topology</li>
+                                <li>The simulator starts with a pre-configured sample network for immediate experimentation</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
