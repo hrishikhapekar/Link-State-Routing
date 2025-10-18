@@ -4,7 +4,6 @@
 [![HTML](https://img.shields.io/badge/HTML5-orange)]()
 [![CSS](https://img.shields.io/badge/CSS3-blue)]()
 [![JavaScript](https://img.shields.io/badge/JS-yellow)]()
-[![License: MIT](https://img.shields.io/badge/License-MIT-green)]()
 
 Interactive **Link-State Routing Algorithm** visualizer to understand how routers communicate and calculate shortest paths.
 
